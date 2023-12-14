@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'db.dart';
 import 'main.dart';
 
@@ -39,6 +38,21 @@ class EditarCarroPageState extends State<EditarCarroPage> {
             marcasDeCarro.isNotEmpty ? marcasDeCarro.first : '';
       }
     });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000, 1, 1),
+      lastDate: DateTime(2101, 12, 31),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        fechaRegistroController.text =
+            "${picked.year}-${picked.month}-${picked.day}";
+      });
+    }
   }
 
   void editarCarro() async {
@@ -220,20 +234,7 @@ class EditarCarroPageState extends State<EditarCarroPage> {
                 ),
                 InkWell(
                   onTap: () {
-                    DatePicker.showDatePicker(
-                      context,
-                      showTitleActions: true,
-                      minTime: DateTime(2000, 1, 1),
-                      maxTime: DateTime(2101, 12, 31),
-                      onConfirm: (date) {
-                        setState(() {
-                          fechaRegistroController.text =
-                              "${date.year}-${date.month}-${date.day}";
-                        });
-                      },
-                      currentTime: DateTime.now(),
-                      locale: LocaleType.es,
-                    );
+                    _selectDate(context);
                   },
                   child: Row(
                     children: [

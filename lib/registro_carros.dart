@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'db.dart';
 
 class CarroPage extends StatefulWidget {
@@ -15,6 +14,7 @@ class _CarroPageState extends State<CarroPage> {
   TextEditingController modeloController = TextEditingController();
   TextEditingController matriculaController = TextEditingController();
   TextEditingController fechaRegistroController = TextEditingController();
+  DateTime? selectedDate;
 
   String selectedBrand = '';
   List<String> preDefinedBrands = [];
@@ -28,7 +28,8 @@ class _CarroPageState extends State<CarroPage> {
   Future<void> loadPreDefinedBrands() async {
     var brands = await obtenerTiposDeCarro();
     if (brands.isNotEmpty) {
-      preDefinedBrands = brands.map((map) => map['TIPO_CARRO'].toString()).toList();
+      preDefinedBrands =
+          brands.map((map) => map['TIPO_CARRO'].toString()).toList();
       if (preDefinedBrands.isNotEmpty) {
         selectedBrand = preDefinedBrands.first;
       }
@@ -101,21 +102,21 @@ class _CarroPageState extends State<CarroPage> {
                   decoration: const InputDecoration(labelText: 'Matrícula'),
                 ),
                 InkWell(
-                  onTap: () {
-                    DatePicker.showDatePicker(
-                      context,
-                      showTitleActions: true,
-                      minTime: DateTime(2000, 1, 1),
-                      maxTime: DateTime(2101, 12, 31),
-                      onConfirm: (date) {
-                        setState(() {
-                          fechaRegistroController.text =
-                              "${date.year}-${date.month}-${date.day}";
-                        });
-                      },
-                      currentTime: DateTime.now(),
-                      locale: LocaleType.es,
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000, 1, 1),
+                      lastDate: DateTime(2101, 12, 31),
                     );
+
+                    if (pickedDate != null && pickedDate != selectedDate) {
+                      setState(() {
+                        selectedDate = pickedDate;
+                        fechaRegistroController.text =
+                            "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+                      });
+                    }
                   },
                   child: Row(
                     children: [
@@ -158,7 +159,8 @@ class _CarroPageState extends State<CarroPage> {
                   child: FutureBuilder(
                     future: todosLosCarros(),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+                      if (!snapshot.hasData ||
+                          (snapshot.data as List).isEmpty) {
                         return const Center(
                           child: Text('No hay registros para mostrar'),
                         );
@@ -175,7 +177,8 @@ class _CarroPageState extends State<CarroPage> {
                                   color: Color.fromARGB(255, 136, 136, 136)),
                             ),
                             elevation: 0.0,
-                            margin: const EdgeInsets.symmetric(vertical: 8.0),
+                            margin:
+                                const EdgeInsets.symmetric(vertical: 8.0),
                             child: ListTile(
                               title: Text(
                                 '${lista[index]['TIPO']} - '
@@ -197,7 +200,6 @@ class _CarroPageState extends State<CarroPage> {
       ),
     );
   }
-
   void agregarCarro() async {
     if (selectedBrand.isEmpty ||
         modeloController.text.isEmpty ||

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'db.dart';
 
 class EditarGastoPage extends StatefulWidget {
@@ -38,7 +37,8 @@ class EditarGastoPageState extends State<EditarGastoPage> {
   void _loadTiposDeGasto() async {
     List<Map<String, dynamic>> tiposDeGastoDB = await obtenerTiposDeGasto();
     setState(() {
-      tiposDeGasto = tiposDeGastoDB.map((tipo) => tipo['TIPO_GASTO'] as String).toList();
+      tiposDeGasto =
+          tiposDeGastoDB.map((tipo) => tipo['TIPO_GASTO'] as String).toList();
       if (!tiposDeGasto.contains(selectedTipoGasto)) {
         selectedTipoGasto = tiposDeGasto.isNotEmpty ? tiposDeGasto[0] : '';
       }
@@ -64,7 +64,8 @@ class EditarGastoPageState extends State<EditarGastoPage> {
     if (gastoValue == null || gastoValue < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Por favor, ingrese un valor numérico positivo para el gasto'),
+          content: Text(
+              'Por favor, ingrese un valor numérico positivo para el gasto'),
           backgroundColor: Colors.cyan,
         ),
       );
@@ -93,7 +94,8 @@ class EditarGastoPageState extends State<EditarGastoPage> {
   }
 
   void mostrarDialogoTipoGasto() {
-    TextEditingController nuevoTipoGastoController = TextEditingController(text: selectedTipoGasto);
+    TextEditingController nuevoTipoGastoController =
+        TextEditingController(text: selectedTipoGasto);
 
     showDialog(
       context: context,
@@ -122,7 +124,8 @@ class EditarGastoPageState extends State<EditarGastoPage> {
               onPressed: () {
                 if (nuevoTipoGastoController.text.isNotEmpty) {
                   setState(() {
-                    tiposDeGasto[tiposDeGasto.indexOf(selectedTipoGasto)] = nuevoTipoGastoController.text;
+                    tiposDeGasto[tiposDeGasto.indexOf(selectedTipoGasto)] =
+                        nuevoTipoGastoController.text;
                     selectedTipoGasto = nuevoTipoGastoController.text;
                   });
                   Navigator.of(context).pop();
@@ -160,7 +163,7 @@ class EditarGastoPageState extends State<EditarGastoPage> {
                     const Text(
                       'Tipo de gasto',
                       style: TextStyle(fontSize: 12, color: Colors.grey),
-                      textAlign: TextAlign.left,  // Alineación a la izquierda
+                      textAlign: TextAlign.left, // Alineación a la izquierda
                     ),
                   ],
                 ),
@@ -199,20 +202,20 @@ class EditarGastoPageState extends State<EditarGastoPage> {
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.calendar_today),
                       onPressed: () {
-                        DatePicker.showDatePicker(
-                          context,
-                          showTitleActions: true,
-                          minTime: DateTime(2000, 1, 1),
-                          maxTime: DateTime(2101, 12, 31),
-                          onChanged: (date) {},
-                          onConfirm: (date) {
+                        showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2000, 1, 1),
+                          lastDate: DateTime(2101, 12, 31),
+                        ).then((date) {
+                          if (date != null && date != selectedDate) {
                             setState(() {
                               selectedDate = date;
-                              fechaGastoController.text = "${date.toLocal()}".split(' ')[0];
+                              fechaGastoController.text =
+                                  "${date.toLocal()}".split(' ')[0];
                             });
-                          },
-                          currentTime: selectedDate,
-                        );
+                          }
+                        });
                       },
                     ),
                   ),
@@ -241,7 +244,7 @@ class EditarGastoPageState extends State<EditarGastoPage> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); 
+                          Navigator.of(context).pop();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey,

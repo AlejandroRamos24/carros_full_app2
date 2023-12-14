@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'db.dart';
 
 class RegistroGastosPage extends StatefulWidget {
@@ -34,6 +33,21 @@ class RegistroGastosPageState extends State<RegistroGastosPage> {
       tiposDeGasto = tiposGasto.map((tipo) => tipo['TIPO_GASTO'].toUpperCase() as String).toList();
       selectedTipoGasto = tiposDeGasto.isNotEmpty ? tiposDeGasto[0] : '';
     });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000, 1, 1),
+      lastDate: DateTime(2101, 12, 31),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        fechaGastoController.text = "${picked.year}-${picked.month}-${picked.day}";
+      });
+    }
   }
 
   void guardarGasto() async {
@@ -211,19 +225,7 @@ class RegistroGastosPageState extends State<RegistroGastosPage> {
                 ),
                 InkWell(
                   onTap: () {
-                    DatePicker.showDatePicker(
-                      context,
-                      showTitleActions: true,
-                      minTime: DateTime(2000, 1, 1),
-                      maxTime: DateTime(2101, 12, 31),
-                      onConfirm: (date) {
-                        setState(() {
-                          fechaGastoController.text = "${date.year}-${date.month}-${date.day}";
-                        });
-                      },
-                      currentTime: DateTime.now(),
-                      locale: LocaleType.es,
-                    );
+                    _selectDate(context);
                   },
                   child: Row(
                     children: [
