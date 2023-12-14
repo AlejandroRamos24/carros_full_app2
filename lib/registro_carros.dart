@@ -99,7 +99,11 @@ class _CarroPageState extends State<CarroPage> {
                 ),
                 TextField(
                   controller: matriculaController,
-                  decoration: const InputDecoration(labelText: 'Matrícula'),
+                  maxLength: 10, 
+                  decoration: const InputDecoration(
+                    labelText: 'Matrícula',
+                    counterText: '', 
+                  ),
                 ),
                 InkWell(
                   onTap: () async {
@@ -200,6 +204,7 @@ class _CarroPageState extends State<CarroPage> {
       ),
     );
   }
+
   void agregarCarro() async {
     if (selectedBrand.isEmpty ||
         modeloController.text.isEmpty ||

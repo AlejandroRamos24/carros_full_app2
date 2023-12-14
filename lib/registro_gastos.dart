@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'db.dart';
 
 class RegistroGastosPage extends StatefulWidget {
@@ -64,7 +65,7 @@ class RegistroGastosPageState extends State<RegistroGastosPage> {
       return;
     }
 
-    int? gastoValue = int.tryParse(gastoController.text);
+    double? gastoValue = double.tryParse(gastoController.text);
 
     if (gastoValue == null || gastoValue < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,13 +77,16 @@ class RegistroGastosPageState extends State<RegistroGastosPage> {
       return;
     }
 
+    // Redondear el valor a dos decimales y convertir a cadena
+    String gastoString = gastoValue.toStringAsFixed(2);
+
     await db.rawInsert(
       'insert into gastos (carro_id, tipo_gasto, auxiliar, gasto, fecha_gasto) values (?, ?, ?, ?, ?)',
       [
         widget.carroId,
         selectedTipoGasto,
         auxiliarController.text,
-        gastoValue,
+        double.parse(gastoString), // Convertir de nuevo a double después del redondeo
         selectedDate.toLocal().toString().split(' ')[0],
       ],
     );
@@ -130,8 +134,27 @@ class RegistroGastosPageState extends State<RegistroGastosPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (nuevoTipoGastoController.text.isNotEmpty) {
-                  await agregarTipoDeGasto(nuevoTipoGastoController.text);
+                String nuevoTipoGasto = nuevoTipoGastoController.text.trim();
+
+                if (nuevoTipoGasto.isEmpty) {
+                  // Show a message if the type of expense is empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('El tipo de gasto está vacío'),
+                      backgroundColor: Colors.cyan,
+                    ),
+                  );
+                } else if (tiposDeGasto.contains(nuevoTipoGasto.toUpperCase())) {
+                  // Show a message if the type of expense already exists
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('El tipo de gasto ya existe'),
+                      backgroundColor: Colors.cyan,
+                    ),
+                  );
+                } else {
+                  // Add the new type of expense
+                  await agregarTipoDeGasto(nuevoTipoGasto);
                   cargarTiposDeGasto();
                   Navigator.of(context).pop();
                 }
@@ -222,6 +245,10 @@ class RegistroGastosPageState extends State<RegistroGastosPage> {
                 TextField(
                   controller: gastoController,
                   decoration: const InputDecoration(labelText: 'Gasto'),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                  ],
                 ),
                 InkWell(
                   onTap: () {

@@ -162,7 +162,7 @@ class ConsultaPageState extends State<ConsultaPage> {
             ),
           ],
         ),
-        body: Column(
+        body: ListView(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),

@@ -74,7 +74,7 @@ class AdministrarTipoCarroPageState extends State<AdministrarTipoCarroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Administrar ${widget.carroInfo['TIPO']} ${widget.carroInfo['MODELO']} '),
+        title: Text('Administrar ${widget.carroInfo['TIPO']} '),
         backgroundColor: Colors.cyan,
       ),
       body: Container(

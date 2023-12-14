@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'db.dart';
 
 class EditarGastoPage extends StatefulWidget {
@@ -64,20 +65,21 @@ class EditarGastoPageState extends State<EditarGastoPage> {
     if (gastoValue == null || gastoValue < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'Por favor, ingrese un valor numérico positivo para el gasto'),
+          content: Text('Por favor, ingrese un valor numérico positivo para el gasto'),
           backgroundColor: Colors.cyan,
         ),
       );
       return;
     }
 
+    String gastoString = gastoValue.toStringAsFixed(2);
+
     await db.rawUpdate(
       'update gastos set tipo_gasto = ?, auxiliar = ?, gasto = ?, fecha_gasto = ? where id = ?',
       [
         selectedTipoGasto,
         auxiliarController.text,
-        gastoValue,
+        double.parse(gastoString),
         selectedDate.toLocal().toString().split(' ')[0],
         widget.gastoInfo['ID'],
       ],
@@ -90,7 +92,7 @@ class EditarGastoPageState extends State<EditarGastoPage> {
       ),
     );
 
-    Navigator.pop(context, true); // Volvemos a la pantalla anterior
+    Navigator.pop(context, true);
   }
 
   void mostrarDialogoTipoGasto() {
@@ -159,11 +161,11 @@ class EditarGastoPageState extends State<EditarGastoPage> {
             child: Column(
               children: [
                 Row(
-                  children: [
-                    const Text(
+                  children: const [
+                    Text(
                       'Tipo de gasto',
                       style: TextStyle(fontSize: 12, color: Colors.grey),
-                      textAlign: TextAlign.left, // Alineación a la izquierda
+                      textAlign: TextAlign.left,
                     ),
                   ],
                 ),
@@ -185,6 +187,12 @@ class EditarGastoPageState extends State<EditarGastoPage> {
                         },
                       ),
                     ),
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        mostrarDialogoTipoGasto();
+                      },
+                    ),
                   ],
                 ),
                 TextField(
@@ -193,6 +201,10 @@ class EditarGastoPageState extends State<EditarGastoPage> {
                 ),
                 TextField(
                   controller: gastoController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                  ],
                   decoration: const InputDecoration(labelText: 'Gasto'),
                 ),
                 TextField(

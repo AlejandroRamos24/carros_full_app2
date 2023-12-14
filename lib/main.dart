@@ -64,7 +64,7 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
   List<Map<String, dynamic>> filtrarCarros(List<Map<String, dynamic>> carros) {
     switch (_filtroSeleccionado) {
       case 'Alfabeto':
-        carros.sort((a, b) => a['TIPO'].toLowerCase().compareTo(b['TIPO'].toLowerCase()));
+        carros.sort((a, b) => a['MATRICULA'][0].toLowerCase().compareTo(b['MATRICULA'][0].toLowerCase()));
         break;
       case 'Recientes':
         carros.sort((a, b) => b['ID'].compareTo(a['ID']));
@@ -268,8 +268,12 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                                           } else {
                                             var gastos = snapshot.data as List<Map<String, dynamic>>;
                                             double gastoTotal = gastos.fold(0.0, (sum, gasto) => sum + (gasto['GASTO'] as double? ?? 0.0));
+
+                                            // Format the total expense to display only two decimal places
+                                            String formattedGastoTotal = gastoTotal.toStringAsFixed(2);
+
                                             return Text(
-                                              'Gasto Total: \$$gastoTotal',
+                                              'Gasto Total: \$$formattedGastoTotal',
                                               style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
                                             );
                                           }

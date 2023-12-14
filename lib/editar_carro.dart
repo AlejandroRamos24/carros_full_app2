@@ -230,7 +230,9 @@ class EditarCarroPageState extends State<EditarCarroPage> {
                   controller: matriculaController,
                   decoration: const InputDecoration(
                     labelText: 'Matrícula',
+                    counterText: '', // Establece el texto del contador como vacío
                   ),
+                  maxLength: 10, // Establece el límite de longitud a 10 caracteres
                 ),
                 InkWell(
                   onTap: () {
